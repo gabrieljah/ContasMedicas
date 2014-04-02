@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="tarefas">
+        <f:view encoding="ISO-8859-1">    
+            <br/>
+            <h:panelGrid columns="2">
+                <h:form id="formGeral">
+                    <p:accordionPanel  dynamic="true"> 
+                        <p:tab title="Capa do Lote">
+                            <h:panelGrid columns="2" >
+
+                                <h:outputLabel for="registroANS" value="Registro ANS.:"/>
+                                <p:selectOneMenu id="registroANS" disabled="#{mbGuiaConsulta.desabilitaCampo}" value="#{mbGuiaConsulta.lote.registroAns}" >
+                                    <f:selectItem itemLabel="000582" itemValue="000582"/>
+                                    <f:selectItem itemLabel="312126" itemValue="312126"/>
+                                </p:selectOneMenu>
+
+                                <h:outputLabel for="codProcedimento" value="Codigo Procedimento.:"/>
+                                <p:selectOneMenu id="codProcedimento" disabled="#{mbGuiaConsulta.desabilitaCampo}" value="#{mbGuiaConsulta.lote.codigoProcedimento}">
+                                    <f:selectItem itemLabel="10101012" itemValue="10101012"/>
+                                    <f:selectItem itemLabel="10014" itemValue="10014"/>
+                                </p:selectOneMenu>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3">
+                                <h:outputLabel for="codAfiliacao" value="Código Afiliação"/>
+                                <p:outputLabel id="codAfiliacao" value="#{mbGuiaConsulta.prestador.idPrestador}"
+                                               onkeyup="this.value = this.value.toUpperCase()"/>
+                                <p:commandButton disabled="#{mbGuiaConsulta.desabilitaCampo}" icon="ui-icon-search" onclick="buscaAfiliado.show()"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="2">
+
+                                <h:outputLabel for="afiliado" value="Afiliado"/>
+                                <p:outputLabel id="afiliado"  value="#{mbGuiaConsulta.prestador.nome}"                                           
+                                               onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="dataEntrega" value="Data Entrega.:"/>
+                                <p:calendar  id="dataEntrega" disabled="#{mbGuiaConsulta.desabilitaCampo}" showOn="button" value="#{mbGuiaConsulta.lote.dataEntrega}"/> 
+
+                                <h:outputLabel for="qtServRealizado" value="Qtde. Serviços Realizados"/>
+                                <p:inputText id="qtServRealizado" disabled="#{mbGuiaConsulta.desabilitaCampo}" size="30" value="#{mbGuiaConsulta.lote.quantidadeServicoPrestado}"
+                                             required="true" requiredMessage="O campo [Qtde. Serviços Realizados] é obrigatório"/>
+
+                                <h:outputLabel for="valorApresentado" value="Valor Apresentado"/>
+                                <p:inputText id="valorApresentado" disabled="#{mbGuiaConsulta.desabilitaCampo}" size="30" value="#{mbGuiaConsulta.lote.valorApresentado}"
+                                             required="true" requiredMessage="O campo [Valor Apresentado] é obrigatório"/>
+                                <br/>
+                                <p:commandButton value="Salvar Capa" disabled="#{mbGuiaConsulta.desabilitaCampo}" action="#{mbGuiaConsulta.salvarCapa}" update=":formGeral"/>
+
+                            </h:panelGrid>
+
+                        </p:tab>
+
+                        <p:tab title="Guia de Consulta" >
+
+                            <h:panelGrid columns="2">
+                                <h:outputLabel for="registro" value="1-Registro ANS.:"/>
+                                <h:outputLabel id="registro" value="#{mbGuiaConsulta.lote.registroAns}"/>
+                                <h:outputLabel for="dataEmissao" value="3-Data Emissão.:"/>
+                                <p:calendar  id="dataEmissao" showOn="button" value="#{mbGuiaConsulta.guiaConsulta.dataEmissaoGuia}"/> 
+                            </h:panelGrid>
+                            <br/>
+                            <p:panel header="Dados Beneficiario">
+                                <h:panelGrid columns="3">
+
+                                    <h:outputLabel for="numerocarteirinha" value="4-Numero Carteirinha.:"/>
+                                    <p:outputLabel id="numerocarteirinha" value="#{mbGuiaConsulta.beneficiario.carteirinha}"                                                    
+                                                   onkeyup="this.value = this.value.toUpperCase()"/>
+                                    <p:commandButton icon="ui-icon-search" onclick="buscaBeneficiario.show();"/>
+                                </h:panelGrid>
+                                <h:panelGrid columns="2" >
+
+                                    <h:outputLabel for="nomeBeneficiario" value="7-Nome.:"/>
+                                    <h:outputLabel id="nomeBeneficiario" value="#{mbGuiaConsulta.beneficiario.nome}"/>
+
+
+                                    <h:outputLabel for="plano" value="5-Plano.:"/>
+                                    <h:outputLabel id="plano" value="#{mbGuiaConsulta.beneficiario.plano}"/>
+
+                                    <h:outputLabel for="validade" value="6-Validade.:"/>
+                                    <h:outputLabel id="validade" value="#{mbGuiaConsulta.beneficiario.validadeCarteirinha}"/>
+
+                                </h:panelGrid>
+                            </p:panel>
+
+                            <p:panel header="Dados Contratado">
+                                <h:panelGrid columns="2" >
+                                    <h:outputLabel for="cnpjcpf" value="9-CNPJ / CPF.:"/>
+                                    <h:outputLabel id="cnpjcpf" value="#{mbGuiaConsulta.prestador.cpfCnpj}"/>
+
+
+                                    <h:outputLabel for="nomeContratado" value="10-Nome Contratado"/>
+                                    <h:outputLabel id="nomeContratado" value="#{mbGuiaConsulta.prestador.nome}"/>
+
+                                    <h:outputLabel for="conselhoProfissional" value="21-Conselho Profissional"/>
+                                    <p:inputText id="conselhoProfissional" size="30" value="#{mbGuiaConsulta.guiaConsulta.conselhoProfissional}"
+                                                 required="true" requiredMessage="O campo [Conselho Profissional] é obrigatório"
+                                                 onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                    <h:outputLabel for="numeroConselho" value="22-Numero Conselho"/>
+                                    <p:inputText id="numeroConselho" size="30" value="#{mbGuiaConsulta.guiaConsulta.numeroProfissional}"
+                                                 required="true" requiredMessage="O campo [Numero Conselho] é obrigatório"
+                                                 onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                    <h:outputLabel for="uf" value="23-UF"/>
+                                    <p:inputText id="uf" size="2" value="#{mbGuiaConsulta.guiaConsulta.uf}"
+                                                 required="true" requiredMessage="O campo [UF] é obrigatório" 
+                                                 onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                    <h:outputLabel for="cbos" value="24-Codigo CBOS"/>
+                                    <p:selectOneMenu id="cbos" value="#{mbGuiaConsulta.guiaConsulta.cbos}">
+                                        <f:selectItems value="#{bbCBOS.cboses}" var="cbos" itemValue="#{cbos.codCbos}" itemLabel="#{cbos.codCbos}"/>
+                                    </p:selectOneMenu>
+
+                                </h:panelGrid>
+                            </p:panel>
+                            <p:panel header="Dados do Atendimento">
+                                <h:panelGrid columns="2" >
+
+                                    <h:outputLabel for="tipoConsulta" value="35-Tipo de Atendimento.:"/>
+                                    <p:selectOneMenu id="tipoConsulta" value="#{mbGuiaConsulta.guiaConsulta.tipoConsulta}">  
+                                        <f:selectItem itemLabel="1-Primeira" itemValue="1" />  
+                                        <f:selectItem itemLabel="2-Seguimento" itemValue="2" />  
+                                        <f:selectItem itemLabel="3-Pré-Natal" itemValue="3" />  
+                                    </p:selectOneMenu> 
+
+                                    <h:outputText value="36-Tipo de Saida.:" />  
+                                    <p:selectOneMenu id="tipoSaida" value="#{mbGuiaConsulta.guiaConsulta.tipoSaida}">  
+                                        <f:selectItem itemLabel="1-Retorno" itemValue="1" />  
+                                        <f:selectItem itemLabel="2-Retorno SADT" itemValue="2" />  
+                                        <f:selectItem itemLabel="3-Referência" itemValue="3" />  
+                                        <f:selectItem itemLabel="4-Internação" itemValue="4" />  
+                                        <f:selectItem itemLabel="5-Alta" itemValue="5" />  
+                                    </p:selectOneMenu> 
+
+                                </h:panelGrid>
+                                <p:commandButton value="Incluir Guia" icon="ui-icon-plus" update=":formGeral" ajax="false"
+                                                 action="#{mbGuiaConsulta.salvarGuia}"/>
+                            </p:panel>
+                        </p:tab>
+                    </p:accordionPanel>
+                </h:form>
+
+                <h:form>
+                    <p:panelGrid columns="1">
+                        <p:commandButton value="Finalizar Lote" icon="ui-icon-disk" update=":formGeral" ajax="false"
+                                         action="#{mbGuiaConsulta.finalizarLote}"/>
+ 
+                        <p:media height="450" width="900" player="pdf" 
+                                 value="/image_upload/Consulta/#{mbGuiaConsulta.importacao.dataImportacao}/#{mbGuiaConsulta.importacao.caminho}"/>
+                    </p:panelGrid>
+                </h:form>
+            </h:panelGrid>
+
+            <p:dialog id="buscaBeneficiario" header="Localizar Beneficiario" widgetVar="buscaBeneficiario" height="150" width="400">  
+                <p:tab title="Procurar Beneficiario">
+                    <h:form id="formTable1">
+                        <p:growl id="msg1"/>
+                        <br/>
+                        <p:panel >
+                            <h:panelGrid columns="2" cellpadding="10" styleClass="panelGrid" id="grid0">
+                                <h:outputLabel for="procura" value="Procurar.:"/>
+                                <p:inputText id="procura" size="30" value="#{mbGuiaConsulta.carteirinha}"                                            
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                            </h:panelGrid>
+                            <p:commandButton value="Localizar" action="#{mbGuiaConsulta.buscarBeneficiario}"
+                                             onclick="buscaBeneficiario.close();" image="ui-icon-search" update=":formGeral">
+                                <f:setPropertyActionListener target="#{mbGuiaConsulta.beneficiario}"
+                                                             value="#{beneficiario}"/>
+                            </p:commandButton>
+                        </p:panel>
+                    </h:form>
+                </p:tab>
+            </p:dialog>  
+
+            <p:dialog id="buscaAfiliado" header="Localizar Afiliado" widgetVar="buscaAfiliado" height="150" width="400">  
+                <p:tab title="Procurar Prestador">
+                    <h:form id="formTable">
+                        <p:growl id="msg1"/>
+                        <br/>
+                        <p:panel >
+                            <h:panelGrid columns="2" cellpadding="10" styleClass="panelGrid" id="grid0">
+                                <h:outputLabel for="procura" value="Procurar.:"/>
+                                <p:inputText id="procura" size="30" value="#{mbGuiaConsulta.idPrestador}"                                            
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                            </h:panelGrid>
+                            <p:commandButton value="Localizar" action="#{mbGuiaConsulta.buscarPrestador}"
+                                             onclick="buscaAfiliado.close();"   image="ui-icon-search" update=":formGeral">
+                                <f:setPropertyActionListener target="#{mbGuiaConsulta.prestador}"
+                                                             value="#{prestador}"/>
+                            </p:commandButton>
+                        </p:panel>
+                    </h:form>
+                </p:tab>
+            </p:dialog>  
+
+        </f:view>
+    </ui:define>
+
+</ui:composition>

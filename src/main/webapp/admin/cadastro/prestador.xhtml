@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/main.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="tarefas">
+        <f:view encoding="ISO-8859-1">    
+            <p:fieldset legend="Prestadores">
+                <br/>
+                <p:accordionPanel multiple="true">  
+                    <p:tab title="Cadastrar Prestador">
+                        <h:form prependId="false" id="frmPrestador">
+                            <p:growl id="msg0"/>
+                            <h:panelGrid columns="2" cellpadding="10" styleClass="panelGrid" id="grid0">
+
+                                <h:outputLabel for="nome" value="Nome.:"/>
+                                <p:inputText id="nome" size="30" value="#{mbPrestador.prestador.nome}"
+                                             required="true" requiredMessage="O campo [Nome] é obrigatório"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="cpfcnpj" value="CPF/CNPJ.:"/>
+                                <p:inputText id="cpfcnpj" size="30" value="#{mbPrestador.prestador.cpfCnpj}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="fantasia" value="Nome Fantasia.:"/>
+                                <p:inputText id="fantasia" size="30" value="#{mbPrestador.prestador.fantasia}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="endereco" value="Endereço.:"/>
+                                <p:inputText id="endereco" size="30" value="#{mbPrestador.prestador.endereco}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="numero" value="Numero.:"/>
+                                <p:inputText id="numero" size="10" value="#{mbPrestador.prestador.numero}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="complemento" value="Complemento.:"/>
+                                <p:inputText id="complemento" size="30" value="#{mbPrestador.prestador.complemento}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="cep" value="CEP.:"/>
+                                <p:inputText id="cep" size="30" value="#{mbPrestador.prestador.cep}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="bairro" value="Bairro.:"/>
+                                <p:inputText id="bairro" size="30" value="#{mbPrestador.prestador.bairro}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="cidade" value="Cidade.:"/>
+                                <p:inputText id="cidade" size="30" value="#{mbPrestador.prestador.cidade}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="uf" value="UF.:"/>
+                                <p:inputText id="uf" size="2" value="#{mbPrestador.prestador.uf}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+                                <h:outputLabel for="telefone" value="Telefone.:"/>
+                                <p:inputText id="telefone" size="30" value="#{mbPrestador.prestador.telefone}"
+                                             onkeyup="this.value = this.value.toUpperCase()"/>
+
+
+
+
+                            </h:panelGrid>
+                            <br/>
+                            <div align="center" >
+                                <p:panel>
+                                    <p:commandButton value="Salvar" ajax="false" action="#{mbPrestador.addPrestador()}"
+                                                     image="ui-icon-disk" update="@form :formTable"/>
+                                    <p:commandButton value="Cancelar" ajax="false"
+                                                     image="ui-icon-close" update="@frmPrestador"/>
+                                </p:panel>
+                            </div>
+                        </h:form>
+                    </p:tab>
+
+                    <p:tab title="Procurar Prestador">
+                        <h:form id="formTable">
+
+                            <p:growl id="msg1"/>
+
+                            <br/>
+
+                            <p:panel >
+                                <h:panelGrid columns="2" cellpadding="10" styleClass="panelGrid" id="grid0">
+                                    <h:outputLabel for="procura" value="Procurar.:"/>
+                                    <p:inputText id="procura" size="30" value="#{mbPrestador.parametroConsulta}"                                            
+                                                 onkeyup="this.value = this.value.toUpperCase()"/>
+                                    <h:outputLabel for="busca" value="Buscar por.:"/> 
+                                    <p:selectOneRadio id="busca" value="#{mbPrestador.colunaParametro}">  
+                                        <f:selectItem itemLabel="Nome" itemValue="nome" />  
+                                        <f:selectItem itemLabel="CPF/CNPJ" itemValue="cpfCnpj" />  
+                                    </p:selectOneRadio>  
+                                </h:panelGrid>
+                                <p:commandButton value="Localizar" update="formTable" action="#{mbPrestador.consultaPrestador}"
+                                                 image="ui-icon-search" />
+                            </p:panel>
+
+                            <br/>
+                            <p:dataTable id="idTabela" var="prestador" value="#{mbPrestador.prestadors}"
+                                         paginator="true" rows="10" emptyMessage="Nenhum registro encontrado"
+                                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink}
+                                         {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="10,30,50" >
+
+                                <f:facet name="header">Prestadores Cadastrados</f:facet>
+                                <p:column filterBy="#{prestador.nome}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Nome" />
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.nome}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="CPF/CNPJ"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.cpfCnpj}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Fantasia"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.fantasia}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Endereço"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.endereco}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Numero"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.numero}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Cidade"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.cidade}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Telefone"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.telefone}"/>
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="UF"/>
+                                    </f:facet>
+                                    <h:outputText value="#{prestador.uf}"/>
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Ações"/>
+                                    </f:facet>
+                                    <p:commandButton value="Editar" image="ui-icon-pencil" ajax="false"
+                                                     process="@this" update=":tbv1:frmBeneficiario">
+                                        <f:setPropertyActionListener target="#{mbPrestador.prestador}"
+                                                                     value="#{prestador}"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:fieldset>
+        </f:view>
+    </ui:define>
+
+</ui:composition>
