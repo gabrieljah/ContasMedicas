@@ -6,13 +6,20 @@
     <session-factory name="session">
         
         <!-- CONFIGURAÇÕES DE CONEXÃO COM O BD -->
-        
-        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property><!-- Defino o driver de conexão com o bd -->
+                
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/contas_medicas_db?createDatabaseIfNotExist=true</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">root</property>
         <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
         
+        <!-- BANCO DE TESTE LOCAL  POSTGREE-->
+<!--        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql:contas_medicas_db</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">root</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        -->
         <!-- HABILITA A EXIBIÇÃO DO SQL GERADO PELO HIBERNATE E FORMATA-O -->
         
         <property name="hibernate.show_sql">true</property>
@@ -43,6 +50,14 @@
         <mapping class="br.com.jrmae.contasmedicas.entities.Procedimento"/>
         <mapping class="br.com.jrmae.contasmedicas.entities.Retorno"/>
         <mapping class="br.com.jrmae.contasmedicas.entities.Importacao"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.IdentificacaoGuia"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.IdentificacaoFontePagadora"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.DadosContratado"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.Identificacao"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.ProfissionalExecutante"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.ConselhoProfissional"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.DadosAtendimento"/>
+        <mapping class="br.com.jrmae.contasmedicas.xml.ProcedimentoXml"/>
        
     </session-factory>
 </hibernate-configuration>

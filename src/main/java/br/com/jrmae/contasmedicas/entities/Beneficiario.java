@@ -6,6 +6,7 @@
 package br.com.jrmae.contasmedicas.entities;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -18,6 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.annotations.ForeignKey;
@@ -26,7 +28,7 @@ import org.hibernate.annotations.ForeignKey;
  *
  * @author gabriel
  */
-@XmlRootElement(name = "Beneficiario")
+@XmlRootElement(name = "ansTISS:beneficiario")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "beneficiario")
@@ -38,16 +40,22 @@ public class Beneficiario implements Serializable {
     @XmlTransient
     @Column(name = "idBeneficiario")
     private Long idBeneficiario;
-    @Column(name = "nome")
-    private String nome;
+    @XmlElement(name = "ansTISS:numeroCarteira")
     @Column(name = "carteirinha")
     private String carteirinha;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Date validadeCarteirinha;
+    @XmlElement(name = "ansTISS:nomeBeneficiario")
+    @Column(name = "nome")
+    private String nome;
+    @XmlElement(name = "ansTISS:nomePlano")
     @Column(name = "plano")
     private String plano;
+    @XmlElement(name = "ansTISS:validadeCarteira")
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date validadeCarteirinha;
+    @XmlTransient
     @Column(name = "convenio")
     private String Convenio;
+    @XmlTransient
     @Column(name = "uf")
     private String uf;
 
@@ -56,10 +64,11 @@ public class Beneficiario implements Serializable {
     @ForeignKey(name = "consultaBeneficiario")
     private List<GuiaConsulta> consulta;
 
+    @XmlTransient
     @OneToMany(mappedBy = "beneficiario", fetch = FetchType.LAZY)
     @ForeignKey(name = "honorarioBeneficiario")
     private List<GuiaHonorario> honorarios;
-
+    @XmlTransient
     @OneToMany(mappedBy = "beneficiario", fetch = FetchType.LAZY)
     @ForeignKey(name = "sadtBeneficiario")
     private List<GuiaSADT> sadts;
@@ -93,7 +102,11 @@ public class Beneficiario implements Serializable {
     }
 
     public void setValidadeCarteirinha(Date validadeCarteirinha) {
-        this.validadeCarteirinha = validadeCarteirinha;
+        try {
+            SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd");
+            this.validadeCarteirinha = dt1.parse(dt1.format(validadeCarteirinha));
+        } catch (Exception e) {
+        }
     }
 
     public String getPlano() {

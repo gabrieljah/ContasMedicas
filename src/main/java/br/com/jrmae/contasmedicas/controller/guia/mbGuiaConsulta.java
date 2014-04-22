@@ -13,12 +13,30 @@ import br.com.jrmae.contasmedicas.entities.GuiaConsulta;
 import br.com.jrmae.contasmedicas.entities.Importacao;
 import br.com.jrmae.contasmedicas.entities.Lote;
 import br.com.jrmae.contasmedicas.entities.Prestador;
-import br.com.jrmae.contasmedicas.util.ANSPrefixMapper;
 import br.com.jrmae.contasmedicas.util.FacesContextUtil;
-import br.gov.ans.padroes.tiss.schemas.MensagemTISS;
+import br.com.jrmae.contasmedicas.xml.Cabecalho;
+import br.com.jrmae.contasmedicas.xml.CodigoPrestadorNaOperadora;
+import br.com.jrmae.contasmedicas.xml.ConselhoProfissional;
+import br.com.jrmae.contasmedicas.xml.DadosAtendimento;
+import br.com.jrmae.contasmedicas.xml.DadosContratado;
+import br.com.jrmae.contasmedicas.xml.Destino;
+import br.com.jrmae.contasmedicas.xml.GuiaFaturamento;
+import br.com.jrmae.contasmedicas.xml.Guias;
+import br.com.jrmae.contasmedicas.xml.Identificacao;
+import br.com.jrmae.contasmedicas.xml.IdentificacaoFontePagadora;
+import br.com.jrmae.contasmedicas.xml.IdentificacaoGuia;
+import br.com.jrmae.contasmedicas.xml.IdentificacaoSoftwareGerador;
+import br.com.jrmae.contasmedicas.xml.IdentificacaoTransacao;
+import br.com.jrmae.contasmedicas.xml.Mensagem;
+import br.com.jrmae.contasmedicas.xml.Origem;
+import br.com.jrmae.contasmedicas.xml.PrestadorParaOperadora;
+import br.com.jrmae.contasmedicas.xml.ProcedimentoXml;
+import br.com.jrmae.contasmedicas.xml.ProfissionalExecutante;
+
 import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -90,8 +108,48 @@ public class mbGuiaConsulta implements Serializable {
         InterfaceDAO beneficiarioDAO = new HibernateDAO(Beneficiario.class, FacesContextUtil.getRequestSession());
         return beneficiarioDAO;
     }
-    //FIM IMPLEMENTAÇÂO METODOS DAO
 
+    private InterfaceDAO<IdentificacaoGuia> identificacaoGuiaDAO() {
+        InterfaceDAO identificacaoGuiaoDAO = new HibernateDAO(IdentificacaoGuia.class, FacesContextUtil.getRequestSession());
+        return identificacaoGuiaoDAO;
+    }
+
+    private InterfaceDAO<ProcedimentoXml> procedimentoXmlDAO() {
+        InterfaceDAO procedimentoXmlDAO = new HibernateDAO(ProcedimentoXml.class, FacesContextUtil.getRequestSession());
+        return procedimentoXmlDAO;
+    }
+
+    private InterfaceDAO<DadosContratado> dadosContratadoDAO() {
+        InterfaceDAO dadosContratadoDAO = new HibernateDAO(DadosContratado.class, FacesContextUtil.getRequestSession());
+        return dadosContratadoDAO;
+    }
+
+    private InterfaceDAO<Identificacao> identificacaoDAO() {
+        InterfaceDAO identificacaoDAO = new HibernateDAO(Identificacao.class, FacesContextUtil.getRequestSession());
+        return identificacaoDAO;
+    }
+
+    private InterfaceDAO<ProfissionalExecutante> profissionalExecutanteDAO() {
+        InterfaceDAO profissionalExecutanteDAO = new HibernateDAO(ProfissionalExecutante.class, FacesContextUtil.getRequestSession());
+        return profissionalExecutanteDAO;
+    }
+
+    private InterfaceDAO<ConselhoProfissional> conselhoProfissionalDAO() {
+        InterfaceDAO conselhoProfissionalDAO = new HibernateDAO(ConselhoProfissional.class, FacesContextUtil.getRequestSession());
+        return conselhoProfissionalDAO;
+    }
+
+    private InterfaceDAO<DadosAtendimento> dadosAtendimentoDAO() {
+        InterfaceDAO dadosAtendimentoDAO = new HibernateDAO(DadosAtendimento.class, FacesContextUtil.getRequestSession());
+        return dadosAtendimentoDAO;
+    }
+
+    private InterfaceDAO<IdentificacaoFontePagadora> identificacaoFontePagadoraDAO() {
+        InterfaceDAO identificacaoFontePagadoraDAO = new HibernateDAO(IdentificacaoFontePagadora.class, FacesContextUtil.getRequestSession());
+        return identificacaoFontePagadoraDAO;
+    }
+
+    //FIM IMPLEMENTAÇÂO METODOS DAO
     //METODO DE BUSCA
     public void buscarBeneficiario() {
         if (getCarteirinha().isEmpty()) {
@@ -158,6 +216,7 @@ public class mbGuiaConsulta implements Serializable {
 
     //INSERÇÔES
     public void salvarCapa() {
+
         lote.setAfiliado(getPrestador().getNome());
         lote.setCodigoAfiliado(getPrestador().getCpfCnpj());
         lote.setImportacao(importacao);
@@ -168,6 +227,53 @@ public class mbGuiaConsulta implements Serializable {
     }
 
     public void salvarGuia() {
+
+        IdentificacaoFontePagadora identificacaoFontePagadora = new IdentificacaoFontePagadora();
+        identificacaoFontePagadora.setRegistroANS(lote.getRegistroAns());
+        identificacaoFontePagadoraDAO().save(identificacaoFontePagadora);
+
+        IdentificacaoGuia identificacaoGuia = new IdentificacaoGuia();
+        identificacaoGuia.setDataEmissaoGuia(guiaConsulta.getDataEmissaoGuia());
+        identificacaoGuia.setIdentificacaoFontePagadora(identificacaoFontePagadora);
+        identificacaoGuia.setNumeroGuiaPrestador("1234567");
+        identificacaoGuiaDAO().save(identificacaoGuia);
+
+        Identificacao identificacao = new Identificacao();
+        identificacao.setCodigoPrestadorNaOperadora(lote.getPrestador().getIdPrestador().toString());
+        identificacaoDAO().save(identificacao);
+        DadosContratado dadosContratado = new DadosContratado();
+        dadosContratado.setIdentificacao(identificacao);
+        dadosContratado.setNomeContratado(lote.getPrestador().getNome());
+        dadosContratadoDAO().save(dadosContratado);
+
+        ConselhoProfissional conselhoProfissional = new ConselhoProfissional();
+        conselhoProfissional.setSiglaConselho(guiaConsulta.getConselhoProfissional());
+        conselhoProfissional.setNumeroConselho(guiaConsulta.getNumeroProfissional());
+        conselhoProfissional.setUfConselho(guiaConsulta.getUf());
+        conselhoProfissionalDAO().save(conselhoProfissional);
+
+        ProfissionalExecutante profissionalExecutante = new ProfissionalExecutante();
+        profissionalExecutante.setCbos(guiaConsulta.getCbos());
+        profissionalExecutante.setConselhoProfissional(conselhoProfissional);
+        profissionalExecutanteDAO().save(profissionalExecutante);
+
+        ProcedimentoXml procedimento = new ProcedimentoXml();
+        procedimento.setCodigoProcedimento(lote.getCodigoProcedimento());
+        procedimento.setCodigoTabela("16");
+        procedimentoXmlDAO().save(procedimento);
+
+        DadosAtendimento dadosAtendimento = new DadosAtendimento();
+        dadosAtendimento.setDataAtendimento(guiaConsulta.getDataEmissaoGuia());
+        dadosAtendimento.setTipoConsulta(guiaConsulta.getTipoConsulta());
+        dadosAtendimento.setTipoSaida(guiaConsulta.getTipoSaida());
+        dadosAtendimento.setProcedimento(procedimento);
+        dadosAtendimentoDAO().save(dadosAtendimento);
+
+        guiaConsulta.setProfissionalExecutante(profissionalExecutante);
+        guiaConsulta.setIdentificacaoGuia(identificacaoGuia);
+        guiaConsulta.setDadosContratado(dadosContratado);
+        guiaConsulta.setDadosAtendimento(dadosAtendimento);
+
         guiaConsulta.setValidadeCarteira(getBeneficiario().getValidadeCarteirinha());
         guiaConsulta.setNumeroCarteira(getBeneficiario().getCarteirinha());
         guiaConsulta.setCodigoOperadorCNPJ(getPrestador().getCpfCnpj());
@@ -177,38 +283,86 @@ public class mbGuiaConsulta implements Serializable {
         guiaConsulta.setLote(lote);
         guiaConsulta.setBeneficiario(beneficiario);
         guiaConsultaDAO().save(guiaConsulta);
-        beneficiario = new Beneficiario();
         guiaConsulta = new GuiaConsulta();
+        beneficiario = new Beneficiario();
+
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, " Gravação efetuada com sucesso", ""));
 
     }
 
-    public String finalizarLote() throws FileNotFoundException, JAXBException {
+    public String finalizarLote() throws FileNotFoundException, JAXBException, IOException {
+
         //instancia context
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
         FacesContext aFacesContext = FacesContext.getCurrentInstance();
         ServletContext context = (ServletContext) aFacesContext.getExternalContext().getContext();
+
         //gera data para criação de pasta
         Date dataAtual = new Date();
         SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd");
+
         //cria pasta xml/consulta/dataAtual
         String realPath = context.getRealPath("/");
         File file = new File(realPath + "/xml/Consulta/" + dt1.format(dataAtual) + "/");
         file.mkdirs();
+
         //faz busca das guias que existe no lote e insere no Array de lote
         guiasdeConsultas = guiaConsultaDAO().getListLoteComGuia(lote.getIdLote());
-        lote.setConsultas(new ArrayList<GuiaConsulta>(guiasdeConsultas));
+        //lote.setConsultas(new ArrayList<GuiaConsulta>(guiasdeConsultas));
 
+        GuiaFaturamento guiaFaturamento = new GuiaFaturamento();
+        guiaFaturamento.setConsultas(new ArrayList<GuiaConsulta>(guiasdeConsultas));
+        Guias guias = new Guias();
+        guias.setGuiaFaturamento(guiaFaturamento);
+        lote.setGuias(guias);
+
+        SimpleDateFormat dtRegistro = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat hrRegistro = new SimpleDateFormat("HH:mm:ss");
+        Date dataRegistro = new Date();
+        Date horaRegistro = new Date();
+
+        IdentificacaoTransacao identificacaoTransacao = new IdentificacaoTransacao();
+        identificacaoTransacao.setDataRegistroTransacaoDate(dtRegistro.format(dataRegistro));
+        identificacaoTransacao.setHoraRegistroTransacaoDate(hrRegistro.format(horaRegistro));
+        identificacaoTransacao.setTipoTransacao("ENVIO_LOTE_GUIAS");
+
+        CodigoPrestadorNaOperadora codigoPrestadorNaOperadora = new CodigoPrestadorNaOperadora();
+        codigoPrestadorNaOperadora.setCodigoPrestadorNaOperadora(lote.getPrestador().getIdPrestador().toString());
+
+        Origem origem = new Origem();
+        origem.setCodigoPrestadorNaOperadora(codigoPrestadorNaOperadora);
+
+        Destino destino = new Destino();
+        destino.setRegistroANS(lote.getRegistroAns());
+
+        IdentificacaoSoftwareGerador identificacaoSoftwareGerador = new IdentificacaoSoftwareGerador();
+        identificacaoSoftwareGerador.setFabricanteAplicativo("JRM Assessoria Empresarial");
+        identificacaoSoftwareGerador.setVersaoAplicativo("1.0.0");
+        identificacaoSoftwareGerador.setNomeAplicativo("Contas Medicas");
+
+        Cabecalho cabecalho = new Cabecalho();
+        cabecalho.setDestino(destino);
+        cabecalho.setOrigem(origem);
+        cabecalho.setVersaoPadrao("3.0.1");
+        cabecalho.setIdentificacaoSoftwareGerador(identificacaoSoftwareGerador);
+        cabecalho.setIdentificacaoTransacao(identificacaoTransacao);
+
+        lote.setNumeroLote("0025461");
+        PrestadorParaOperadora prestadorParaOperadora = new PrestadorParaOperadora();
+        prestadorParaOperadora.setLote(lote);
+
+        Mensagem mensagem = new Mensagem();
+        mensagem.setCabecalho(cabecalho);
+        mensagem.setPrestadorParaOperadora(prestadorParaOperadora);
         //Gerando o XML
         JAXBContext jaxbContext;
-        jaxbContext = JAXBContext.newInstance(Lote.class);
+        jaxbContext = JAXBContext.newInstance(Mensagem.class);
         Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", new ANSPrefixMapper());
         marshaller.setProperty("com.sun.xml.bind.xmlDeclaration", Boolean.TRUE);
         marshaller.setProperty(marshaller.JAXB_ENCODING, "ISO-8859-1");
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.ans.gov.br/padroes/tiss/schemas/");
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.marshal(mensagem, new File(realPath + "/xml/Consulta/" + dt1.format(dataAtual) + "/" + importacao.getCaminho() + ".xml"));
 
 //        JAXBContext jaxbContext = JAXBContext.newInstance(Lote.class);
 //        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -216,25 +370,27 @@ public class mbGuiaConsulta implements Serializable {
 //        jaxbMarshaller.setProperty("com.sun.xml.bind.xmlDeclaration", Boolean.TRUE);
 //        jaxbMarshaller.setProperty(jaxbMarshaller.JAXB_ENCODING, "ISO-8859-1");
 //        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        //Marshal the employees list in file
-        marshaller.marshal(lote, new File(realPath + "/xml/Consulta/" + dt1.format(dataAtual) + "/" + importacao.getCaminho() + ".xml"));
-
         //Limpando as coisas
         guiaConsulta = new GuiaConsulta();
         lote = new Lote();
         beneficiario = new Beneficiario();
         prestador = new Prestador();
         desabilitaCampo = false;
-        importacao.setStatus("2");
-        importacaoDAO().merge(importacao);
+
+        importacao.setStatus(
+                "2");
+        importacaoDAO()
+                .merge(importacao);
         importacao = new Importacao();
 
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, " Lote Finalizado com Sucesso!", ""));
+        FacesContext.getCurrentInstance()
+                .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, " Lote Finalizado com Sucesso!", ""));
 
         return formTabelaConsulta();
-    }
 
-    //GETTERS AND SETTERS
+    }
+//GETTERS AND SETTERS
+
     public Lote getLote() {
         return lote;
     }

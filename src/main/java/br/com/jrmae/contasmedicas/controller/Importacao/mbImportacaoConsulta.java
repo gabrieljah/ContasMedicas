@@ -52,7 +52,6 @@ public class mbImportacaoConsulta implements Serializable {
         importacao.setCaminho(caminho);
         importacao.setDataImportacao(dataImportacao);
         importacaoDAO().save(importacao);
-
         // FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, " Informações Foram Salvas com Sucesso!", ""));
     }
 

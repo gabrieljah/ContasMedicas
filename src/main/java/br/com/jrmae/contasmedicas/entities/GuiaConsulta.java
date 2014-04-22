@@ -5,7 +5,12 @@
  */
 package br.com.jrmae.contasmedicas.entities;
 
+import br.com.jrmae.contasmedicas.xml.DadosAtendimento;
+import br.com.jrmae.contasmedicas.xml.DadosContratado;
+import br.com.jrmae.contasmedicas.xml.IdentificacaoGuia;
+import br.com.jrmae.contasmedicas.xml.ProfissionalExecutante;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -18,19 +23,19 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import org.hibernate.annotations.ForeignKey;
-import org.springframework.context.annotation.Primary;
 
 /**
  *
  * @author gabriel
  */
-@XmlRootElement(name = "Guia")
+@XmlRootElement(name = "guiaConsulta")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "consulta")
@@ -42,51 +47,88 @@ public class GuiaConsulta implements Serializable {
     @Column(name = "idConsulta")
     @XmlTransient
     private Long idConsulta;
-
+    @XmlTransient
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date dataEmissaoGuia;
     @Column(name = "numeroCarteira")
+    @XmlTransient
     private String numeroCarteira;
     @Column(name = "plano")
+    @XmlTransient
     private String plano;
+    @XmlTransient
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date validadeCarteira;
     @Column(name = "nomeBeneficiario")
+    @XmlTransient
     private String nomeBeneficiario;
     @Column(name = "codigoOperador")
+    @XmlTransient
     private String codigoOperadorCNPJ;
     @Column(name = "nomeContratado")
+    @XmlTransient
     private String nomeContratado;
     @Column(name = "conselho_profissional")
+    @XmlTransient
     private String conselhoProfissional;
     @Column(name = "numero_Profissional")
+    @XmlTransient
     private String numeroProfissional;
     @Column(name = "uf")
+    @XmlTransient
     private String uf;
     @Column(name = "cbos")
+    @XmlTransient
     private String cbos;
-
+    @XmlTransient
     @Column(name = "tipo_consulta")
     private String tipoConsulta;
+    @XmlTransient
     @Column(name = "tipo_saida")
     private String tipoSaida;
+
+    @XmlElement(name = "ansTISS:identificacaoGuia")
+    @ManyToOne(optional = false)
+    @ForeignKey(name = "consultaIdentificacaoGuia")
+    @JoinColumn(name = "identificacaoGuia", referencedColumnName = "idIdentificacaoGuia")
+    private IdentificacaoGuia identificacaoGuia;
+
+    @XmlElement(name = "ansTISS:beneficiario")
+    @ManyToOne(optional = false)
+    @ForeignKey(name = "consultaBeneficiario")
+    @JoinColumn(name = "beneficiario", referencedColumnName = "idBeneficiario")
+    private Beneficiario beneficiario;
+
+    @XmlElement(name = "ansTISS:dadosContratado")
+    @ManyToOne(optional = false)
+    @ForeignKey(name = "consultaDadosContratado")
+    @JoinColumn(name = "dadosContratado", referencedColumnName = "idDadosContratado")
+    private DadosContratado dadosContratado;
+
+    @XmlElement(name = "ansTISS:profissionalExecutante")
+    @ManyToOne(optional = false)
+    @ForeignKey(name = "consultaProfissionalExecutante")
+    @JoinColumn(name = "profissionalExecutante", referencedColumnName = "idProfissionalExecutante")
+    private ProfissionalExecutante profissionalExecutante;
+
+    @XmlElement(name = "ansTISS:dadosAtendimento")
+    @ManyToOne(optional = false)
+    @ForeignKey(name = "consultaDadosAtendimento")
+    @JoinColumn(name = "dadosAtendimento", referencedColumnName = "idDadosAtendimento")
+    private DadosAtendimento dadosAtendimento;
 
     @OneToMany(mappedBy = "consulta", fetch = FetchType.LAZY)
     @ForeignKey(name = "retornoConsulta")
     private List<Retorno> retornos;
+
     @XmlTransient
     @ManyToOne(optional = false)
     @ForeignKey(name = "consultaLote")
     @JoinColumn(name = "lote", referencedColumnName = "idLote")
     private Lote lote;
 
-    @XmlTransient
-    @ManyToOne(optional = false)
-    @ForeignKey(name = "consultaBeneficiario")
-    @JoinColumn(name = "beneficiario", referencedColumnName = "idBeneficiario")
-    private Beneficiario beneficiario;
-
     public GuiaConsulta() {
+        this.profissionalExecutante = new ProfissionalExecutante();
 
     }
 
@@ -99,6 +141,7 @@ public class GuiaConsulta implements Serializable {
     }
 
     public Date getDataEmissaoGuia() {
+
         return dataEmissaoGuia;
     }
 
@@ -128,22 +171,6 @@ public class GuiaConsulta implements Serializable {
 
     public void setUf(String uf) {
         this.uf = uf;
-    }
-
-    public String getTipoConsulta() {
-        return tipoConsulta;
-    }
-
-    public void setTipoConsulta(String tipoConsulta) {
-        this.tipoConsulta = tipoConsulta;
-    }
-
-    public String getTipoSaida() {
-        return tipoSaida;
-    }
-
-    public void setTipoSaida(String tipoSaida) {
-        this.tipoSaida = tipoSaida;
     }
 
     public Lote getLote() {
@@ -207,7 +234,12 @@ public class GuiaConsulta implements Serializable {
     }
 
     public void setValidadeCarteira(Date validadeCarteira) {
-        this.validadeCarteira = validadeCarteira;
+        try {
+            SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-MM-dd");
+            this.validadeCarteira = dt1.parse(dt1.format(validadeCarteira));
+        } catch (Exception e) {
+        }
+
     }
 
     public String getNomeBeneficiario() {
@@ -232,6 +264,54 @@ public class GuiaConsulta implements Serializable {
 
     public void setNomeContratado(String nomeContratado) {
         this.nomeContratado = nomeContratado;
+    }
+
+    public IdentificacaoGuia getIdentificacaoGuia() {
+        return identificacaoGuia;
+    }
+
+    public void setIdentificacaoGuia(IdentificacaoGuia identificacaoGuia) {
+        this.identificacaoGuia = identificacaoGuia;
+    }
+
+    public DadosContratado getDadosContratado() {
+        return dadosContratado;
+    }
+
+    public void setDadosContratado(DadosContratado dadosContratado) {
+        this.dadosContratado = dadosContratado;
+    }
+
+    public ProfissionalExecutante getProfissionalExecutante() {
+        return profissionalExecutante;
+    }
+
+    public void setProfissionalExecutante(ProfissionalExecutante profissionalExecutante) {
+        this.profissionalExecutante = profissionalExecutante;
+    }
+
+    public DadosAtendimento getDadosAtendimento() {
+        return dadosAtendimento;
+    }
+
+    public void setDadosAtendimento(DadosAtendimento dadosAtendimento) {
+        this.dadosAtendimento = dadosAtendimento;
+    }
+
+    public String getTipoConsulta() {
+        return tipoConsulta;
+    }
+
+    public void setTipoConsulta(String tipoConsulta) {
+        this.tipoConsulta = tipoConsulta;
+    }
+
+    public String getTipoSaida() {
+        return tipoSaida;
+    }
+
+    public void setTipoSaida(String tipoSaida) {
+        this.tipoSaida = tipoSaida;
     }
 
     @Override

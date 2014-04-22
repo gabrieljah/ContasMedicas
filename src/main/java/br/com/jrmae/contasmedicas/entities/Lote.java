@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package br.com.jrmae.contasmedicas.entities;
+
+import br.com.jrmae.contasmedicas.xml.Guias;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -29,7 +31,7 @@ import org.hibernate.annotations.ForeignKey;
  *
  * @author gabriel
  */
-@XmlRootElement(name = "Lote")
+@XmlRootElement(name = "loteGuias")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 @Table(name = "lote")
@@ -41,22 +43,34 @@ public class Lote implements Serializable {
     @XmlTransient
     @Column(name = "idLote")
     private Long idLote;
+    @XmlTransient
     @Column(name = "registro_ans")
-    private int registroAns;
+    private String registroAns;
+    @XmlTransient
     @Column(name = "Afiliado")
     private String afiliado;
+    @XmlTransient
     @Column(name = "codigoAfiliado")
     private String codigoAfiliado;
+    @XmlTransient
     @Column(name = "unidade")
     private String unidadeAfiliado;
+    @XmlTransient
     @Column(name = "codigo_procedimento")
-    private int codigoProcedimento;
+    private String codigoProcedimento;
+    @XmlTransient
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date dataEntrega;
+    @XmlTransient
     @Column(name = "quantidade_servico_prestado")
     private int quantidadeServicoPrestado;
+    @XmlTransient
     @Column(name = "valor_apresentado")
     private double valorApresentado;
+    @XmlElement(name = "ansTISS:numeroLote")
+    private String numeroLote = new String();
+    @XmlElement(name = "ansTISS:guias")
+    private Guias guias = new Guias();
 
     @XmlTransient
     @ManyToOne(optional = false)
@@ -64,7 +78,7 @@ public class Lote implements Serializable {
     @JoinColumn(name = "prestador", referencedColumnName = "idPrestador")
     private Prestador prestador;
 
-    @XmlElement(name = "Guia")
+    @XmlElement(name = "guiaConsulta")
     @OneToMany(mappedBy = "lote", fetch = FetchType.LAZY)
     @ForeignKey(name = "consultaLote")
     private List<GuiaConsulta> consultas;
@@ -95,19 +109,19 @@ public class Lote implements Serializable {
         this.idLote = idLote;
     }
 
-    public int getRegistroAns() {
+    public String getRegistroAns() {
         return registroAns;
     }
 
-    public void setRegistroAns(int registroAns) {
+    public void setRegistroAns(String registroAns) {
         this.registroAns = registroAns;
     }
 
-    public int getCodigoProcedimento() {
+    public String getCodigoProcedimento() {
         return codigoProcedimento;
     }
 
-    public void setCodigoProcedimento(int codigoProcedimento) {
+    public void setCodigoProcedimento(String codigoProcedimento) {
         this.codigoProcedimento = codigoProcedimento;
     }
 
@@ -199,6 +213,22 @@ public class Lote implements Serializable {
 
     public void setUnidadeAfiliado(String unidadeAfiliado) {
         this.unidadeAfiliado = unidadeAfiliado;
+    }
+
+    public String getNumeroLote() {
+        return numeroLote;
+    }
+
+    public void setNumeroLote(String numeroLote) {
+        this.numeroLote = numeroLote;
+    }
+
+    public Guias getGuias() {
+        return guias;
+    }
+
+    public void setGuias(Guias guias) {
+        this.guias = guias;
     }
 
     @Override
